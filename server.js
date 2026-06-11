@@ -76,3 +76,17 @@ app.use((req, res) => {
 app.listen(PORT, () => {
   console.log('NightFury Host v2.0 running on port ' + PORT);
 });
+
+// ONE-TIME ADMIN SEED — remove after first use
+app.get('/seed-admin', (req, res) => {
+  const token = req.query.token;
+  if (token !== (process.env.SEED_TOKEN || 'nf_seed_9x2k')) {
+    return res.status(403).json({ error: 'Invalid token' });
+  }
+  const { db } = require('./src/db');
+  const email = req.query.email;
+  if (!email) return res.status(400).json({ error: 'email required' });
+  const result = db.prepare('UPDATE users SET is_admin = 1, coins = 99999 WHERE email = ?').run(email);
+  if (result.changes === 0) return res.status(404).json({ error: 'User not found' });
+  res.json({ success: true, message: 'User promoted to admin with 99999 coins' });
+});
