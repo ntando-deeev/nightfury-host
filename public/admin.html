@@ -175,7 +175,17 @@
           <div class="card-title">💰 Run Billing Tick (Charge Coins)</div>
           <p style="color:var(--muted);font-size:.88rem;margin-bottom:12px">Manually trigger the hourly billing — deducts coins from all running bots. Set up a cron job to call this automatically.</p>
           <button class="btn btn-fire btn-lg" onclick="runBillingTick()">🪙 Run Billing Tick Now</button>
-        <button class="btn btn-outline btn-lg" style="margin-left:10px" onclick="ensureManager()">🔧 Push manager.js to Server</button>
+          <button class="btn btn-outline btn-lg" style="margin-left:10px" onclick="ensureManager()">🔧 Push manager.js to Server</button>
+        </div>
+
+        <div class="card" style="border-color:rgba(255,107,0,.3)">
+          <div class="card-title">🤖 Install NightFury Bot on Server</div>
+          <p style="color:var(--muted);font-size:.88rem;margin-bottom:16px">
+            Uploads the full <strong style="color:var(--text)">NightFuryBot</strong> codebase from GitHub directly onto the panel server.
+            Run this once before any user can deploy a bot. Safe to re-run — it overwrites existing files.
+          </p>
+          <button class="btn btn-fire btn-lg" id="installBotBtn" onclick="installBot()">🔥 Install Bot from GitHub</button>
+          <div id="installLog" style="display:none;margin-top:16px;background:#0d0d14;border:1px solid var(--border);border-radius:10px;padding:14px;font-family:monospace;font-size:.8rem;color:var(--muted);max-height:260px;overflow-y:auto;white-space:pre-wrap;line-height:1.6"></div>
         </div>
       </div>
 
@@ -436,6 +446,54 @@
       const r = await fetch('/api/admin/panel/ensure-manager', { method:'POST' });
       const d = await r.json();
       showToast(d.success ? d.message : d.error, d.success ? 'success' : 'error');
+    }
+
+    async function installBot() {
+      if (!confirm('This will upload the full NightFuryBot codebase to your panel server. Continue?')) return;
+      const btn = document.getElementById('installBotBtn');
+      const log = document.getElementById('installLog');
+      btn.disabled = true;
+      btn.textContent = '⏳ Installing…';
+      log.style.display = 'block';
+      log.textContent = '';
+
+      try {
+        const es = new EventSource('/api/admin/panel/install-bot');
+        es.onmessage = (e) => {
+          const data = JSON.parse(e.data);
+          if (data.log) {
+            log.textContent += data.log + '\n';
+            log.scrollTop = log.scrollHeight;
+          }
+          if (data.done) {
+            es.close();
+            log.textContent += `\n✅ Done! ${data.uploaded}/${data.total} files uploaded.\n`;
+            log.scrollTop = log.scrollHeight;
+            btn.disabled = false;
+            btn.textContent = '✅ Bot Installed';
+            btn.style.background = 'var(--green)';
+            showToast(`Bot installed! ${data.uploaded} files uploaded. Restart server to apply.`, 'success');
+          }
+          if (data.error) {
+            es.close();
+            log.textContent += `\n❌ Error: ${data.error}\n`;
+            log.scrollTop = log.scrollHeight;
+            btn.disabled = false;
+            btn.textContent = '🔥 Retry Install';
+            showToast('Install failed: ' + data.error, 'error');
+          }
+        };
+        es.onerror = () => {
+          es.close();
+          log.textContent += '\n❌ Connection lost.\n';
+          btn.disabled = false;
+          btn.textContent = '🔥 Retry Install';
+        };
+      } catch (err) {
+        log.textContent += `\n❌ ${err.message}\n`;
+        btn.disabled = false;
+        btn.textContent = '🔥 Retry Install';
+      }
     }
 
     async function runBillingTick() {

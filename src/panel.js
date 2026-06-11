@@ -155,9 +155,89 @@ async function restartServer() {
   return true;
 }
 
+// ─── BOT INSTALLER ────────────────────────────────────────────────────────────
+// Fetches every file from the NightFuryBot GitHub repo and uploads it to the
+// panel server via the Files API. Skips binary .jsc files (uploaded as-is via
+// base64) and writes plain-text files directly.
+async function installBotFromGitHub(onProgress) {
+  const REPO    = 'ntando-deeev/NightFuryBot';
+  const BRANCH  = 'main';
+  const log     = onProgress || (() => {});
+  const client  = getClient();
+  const sid     = getServerId();
+
+  log('Fetching file tree from GitHub…');
+
+  // 1. Get full tree
+  const treeRes = await axios.get(
+    `https://api.github.com/repos/${REPO}/git/trees/${BRANCH}?recursive=1`,
+    { timeout: 15000 }
+  );
+  const tree = (treeRes.data.tree || []).filter(x => x.type === 'blob');
+  log(`Found ${tree.length} files to install`);
+
+  // 2. Ensure directories exist (create them ahead of time)
+  const dirs = new Set();
+  tree.forEach(f => {
+    const parts = f.path.split('/');
+    if (parts.length > 1) {
+      for (let i = 1; i < parts.length; i++) {
+        dirs.add('/' + parts.slice(0, i).join('/'));
+      }
+    }
+  });
+  for (const dir of [...dirs].sort()) {
+    try {
+      await client.post(`/api/client/servers/${sid}/files/create-folder`, { root: '/', name: dir.slice(1) });
+    } catch {}
+  }
+
+  // 3. Upload every file
+  let done = 0;
+  for (const file of tree) {
+    const rawUrl = `https://raw.githubusercontent.com/${REPO}/${BRANCH}/${file.path}`;
+    try {
+      // Fetch raw content
+      const resp = await axios.get(rawUrl, { responseType: 'arraybuffer', timeout: 20000 });
+      const buf  = Buffer.from(resp.data);
+
+      // Write to panel server
+      await client.post(
+        `/api/client/servers/${sid}/files/write`,
+        buf,
+        {
+          params:  { file: '/' + file.path },
+          headers: { 'Content-Type': 'application/octet-stream' },
+          maxBodyLength: Infinity,
+        }
+      );
+      done++;
+      if (done % 10 === 0 || done === tree.length) log(`Uploaded ${done}/${tree.length} files…`);
+    } catch (e) {
+      log(`⚠️  Failed: ${file.path} — ${e.message}`);
+    }
+  }
+
+  // 4. Write empty bots.json if not already there
+  try {
+    await client.post(
+      `/api/client/servers/${sid}/files/write`,
+      '[]',
+      { params: { file: '/bots.json' }, headers: { 'Content-Type': 'text/plain' } }
+    );
+  } catch {}
+
+  // 5. Ensure manager.js is present
+  await ensureManagerScript();
+
+  log(`✅ Installation complete — ${done}/${tree.length} files uploaded`);
+  return { uploaded: done, total: tree.length };
+}
+
 module.exports = {
   getServerStatus, powerAction,
   deployBot, stopBot, removeBot,
   listDeployedBots, restartServer,
   readBotsConfig, writeBotsConfig, ensureManagerScript,
+  installBotFromGitHub,
 };

@@ -179,6 +179,26 @@ router.post('/panel/ensure-manager', async (req, res) => {
   }
 });
 
+// Install NightFuryBot from GitHub onto the panel server (SSE stream)
+router.get('/panel/install-bot', async (req, res) => {
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+  res.flushHeaders();
+
+  const send = (msg) => {
+    res.write(`data: ${JSON.stringify({ log: msg })}\n\n`);
+  };
+
+  try {
+    const result = await panel.installBotFromGitHub(send);
+    res.write(`data: ${JSON.stringify({ done: true, ...result })}\n\n`);
+  } catch (err) {
+    res.write(`data: ${JSON.stringify({ error: err.message })}\n\n`);
+  }
+  res.end();
+});
+
 // Settings
 router.get('/settings', (req, res) => {
   const rows = db.prepare('SELECT key, value FROM settings').all();
