@@ -91,4 +91,36 @@ const addCoins = db.transaction((userId, amount, type, description) => {
   db.prepare('INSERT INTO coin_transactions (user_id, amount, type, description) VALUES (?, ?, ?, ?)').run(userId, amount, type, description);
 });
 
+// ─── ADMIN SEED (runs on every startup) ───────────────────────────────────────
+// If ADMIN_EMAIL + ADMIN_PASSWORD env vars are set, ensure that admin exists.
+// Safe to run on every boot — uses INSERT OR IGNORE so it never overwrites.
+(async () => {
+  const adminEmail    = process.env.ADMIN_EMAIL;
+  const adminPassword = process.env.ADMIN_PASSWORD;
+  const adminUsername = process.env.ADMIN_USERNAME || 'admin';
+  if (!adminEmail || !adminPassword) return;
+
+  const existing = db.prepare('SELECT id FROM users WHERE email = ?').get(adminEmail);
+  if (existing) {
+    // Ensure they are still marked admin in case of accidental demotion
+    db.prepare('UPDATE users SET is_admin = 1 WHERE email = ?').run(adminEmail);
+    return;
+  }
+
+  try {
+    const bcrypt  = require('bcryptjs');
+    const { v4: uuidv4 } = require('uuid');
+    const hash    = await bcrypt.hash(adminPassword, 10);
+    const uuid    = uuidv4();
+    const refCode = uuidv4().slice(0, 8).toUpperCase();
+    db.prepare(`
+      INSERT OR IGNORE INTO users (uuid, username, email, password, coins, is_admin, referral_code)
+      VALUES (?, ?, ?, ?, 99999, 1, ?)
+    `).run(uuid, adminUsername, adminEmail, hash, refCode);
+    console.log(`[NightFury] Admin account seeded: ${adminEmail}`);
+  } catch (e) {
+    console.error('[NightFury] Admin seed error:', e.message);
+  }
+})();
+
 module.exports = { db, getSetting, setSetting, addCoins };
