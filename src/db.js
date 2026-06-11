@@ -69,6 +69,8 @@ setDefault.run('coins_per_hour', '2');
 setDefault.run('daily_reward', '20');
 setDefault.run('signup_bonus', '50');
 setDefault.run('referral_reward', '25');
+setDefault.run('deploy_cost', '5');
+setDefault.run('restart_cost', '2');
 setDefault.run('panel_url', process.env.PANEL_URL || '');
 setDefault.run('panel_key', process.env.PANEL_KEY || '');
 setDefault.run('panel_server_id', process.env.PANEL_SERVER_ID || '36a73d5f');

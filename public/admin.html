@@ -105,7 +105,8 @@
       <div class="page active" id="page-overview">
         <div class="grid-4">
           <div class="card"><div class="card-title">👥 Total Users</div><div class="stat-big fire" id="st-users">—</div></div>
-          <div class="card"><div class="card-title">🤖 Active Bots</div><div class="stat-big green" id="st-bots">—</div></div>
+          <div class="card"><div class="card-title">🤖 DB Active Bots</div><div class="stat-big green" id="st-bots">—</div></div>
+          <div class="card"><div class="card-title">🔴 Live on Panel</div><div class="stat-big purple" id="st-live">—</div></div>
           <div class="card"><div class="card-title">🪙 Total Coins</div><div class="stat-big fire" id="st-coins">—</div></div>
           <div class="card"><div class="card-title">🚫 Banned</div><div class="stat-big red" id="st-banned">—</div></div>
         </div>
@@ -142,10 +143,11 @@
       <div class="page" id="page-bots">
         <div class="card">
           <div class="card-title">🤖 All Deployed Bots</div>
+          <div id="botsPanel"></div>
           <div class="table-wrap">
             <table>
-              <thead><tr><th>User</th><th>Session ID</th><th>Status</th><th>Deployed</th><th>Hours</th></tr></thead>
-              <tbody id="botsTable"><tr><td colspan="5" style="text-align:center;color:var(--muted);padding:30px">Loading...</td></tr></tbody>
+              <thead><tr><th>User</th><th>Session ID</th><th>Status</th><th>Deployed</th><th>Hours</th><th>Action</th></tr></thead>
+              <tbody id="botsTable"><tr><td colspan="6" style="text-align:center;color:var(--muted);padding:30px">Loading...</td></tr></tbody>
             </table>
           </div>
         </div>
@@ -173,6 +175,7 @@
           <div class="card-title">💰 Run Billing Tick (Charge Coins)</div>
           <p style="color:var(--muted);font-size:.88rem;margin-bottom:12px">Manually trigger the hourly billing — deducts coins from all running bots. Set up a cron job to call this automatically.</p>
           <button class="btn btn-fire btn-lg" onclick="runBillingTick()">🪙 Run Billing Tick Now</button>
+        <button class="btn btn-outline btn-lg" style="margin-left:10px" onclick="ensureManager()">🔧 Push manager.js to Server</button>
         </div>
       </div>
 
@@ -183,7 +186,7 @@
           <div class="table-wrap">
             <table>
               <thead><tr><th>User</th><th>Amount</th><th>Type</th><th>Description</th><th>Date</th></tr></thead>
-              <tbody id="txnTable"><tr><td colspan="5" style="text-align:center;color:var(--muted);padding:30px">Loading...</td></tr></tbody>
+              <tbody id="txnTable"><tr><td colspan="6" style="text-align:center;color:var(--muted);padding:30px">Loading...</td></tr></tbody>
             </table>
           </div>
         </div>
@@ -197,6 +200,8 @@
             <div class="grid-2">
               <div>
                 <div class="form-group"><label>Coins Per Hour (hosting cost)</label><input type="number" id="s-coins_per_hour" min="0"/></div>
+                <div class="form-group"><label>Deploy Cost (coins)</label><input type="number" id="s-deploy_cost" min="0"/></div>
+                <div class="form-group"><label>Restart Cost (coins)</label><input type="number" id="s-restart_cost" min="0"/></div>
                 <div class="form-group"><label>Daily Reward (coins)</label><input type="number" id="s-daily_reward" min="0"/></div>
                 <div class="form-group"><label>Signup Bonus (coins)</label><input type="number" id="s-signup_bonus" min="0"/></div>
                 <div class="form-group"><label>Referral Reward (coins)</label><input type="number" id="s-referral_reward" min="0"/></div>
@@ -268,6 +273,7 @@
       const d = await r.json();
       document.getElementById('st-users').textContent = d.totalUsers;
       document.getElementById('st-bots').textContent = d.runningBots + '/' + d.totalBots;
+      document.getElementById('st-live').textContent = d.liveBotCount !== undefined ? d.liveBotCount : '—';
       document.getElementById('st-coins').textContent = d.totalCoins;
       document.getElementById('st-banned').textContent = d.bannedUsers;
       renderServerStatus(d.panel, 'serverStatusDisplay');
@@ -366,22 +372,70 @@
 
     async function loadBots() {
       const r = await fetch('/api/admin/bots');
-      const bots = await r.json();
+      const d = await r.json();
+      const bots = d.bots || d;
+      const live = d.liveBots || [];
+
+      // Show live bots.json summary
+      const liveCount = live.filter(b => b.active).length;
+      const liveHtml = live.length ? `
+        <div style="margin-bottom:16px;padding:12px 16px;background:#0d0d14;border-radius:10px;border:1px solid var(--border)">
+          <div style="font-weight:700;margin-bottom:8px;color:var(--fire2)">🔴 Live on Panel (bots.json) — ${liveCount} active</div>
+          ${live.map(b => `
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border)">
+              <span><strong>${b.username || b.userId}</strong> <span class="badge ${b.active?'badge-green':'badge-gray'}" style="margin-left:6px">${b.active?'active':'inactive'}</span></span>
+              <div style="display:flex;gap:6px">
+                ${b.active ? `<button class="btn btn-red" onclick="adminStopBot('${b.userId}')">⏹ Stop</button>` : ''}
+                <button class="btn btn-outline" onclick="adminRemoveBot('${b.userId}')">🗑 Remove</button>
+              </div>
+            </div>
+          `).join('')}
+        </div>` : '';
+
+      document.getElementById('botsPanel').innerHTML = liveHtml;
       document.getElementById('botsTable').innerHTML = bots.map(b => `
         <tr>
-          <td><strong>${b.username}</strong></td>
-          <td style="font-family:monospace;font-size:.8rem;color:var(--muted)">${b.session_id ? b.session_id.substring(0,30)+'...' : '—'}</td>
-          <td><span class="badge ${b.status==='running'?'badge-green':'badge-gray'}">${b.status}</span></td>
+          <td><strong>${b.username}</strong><br/><span style="color:var(--muted);font-size:.78rem">${b.email}</span></td>
+          <td style="font-family:monospace;font-size:.78rem;color:var(--muted);max-width:180px;overflow:hidden;text-overflow:ellipsis">${b.session_id ? b.session_id.substring(0,28)+'...' : '—'}</td>
+          <td>
+            <span class="badge ${b.status==='running'?'badge-green':'badge-gray'}">${b.status}</span>
+            ${b.live_active ? '<span class="badge badge-fire" style="margin-left:4px">LIVE</span>' : ''}
+          </td>
           <td style="color:var(--muted)">${b.deployed_at ? new Date(b.deployed_at*1000).toLocaleDateString() : '—'}</td>
           <td>${parseFloat(b.total_hours||0).toFixed(1)}h</td>
+          <td>
+            ${b.status==='running' ? `<button class="btn btn-red" onclick="adminStopBot('${b.user_id}')">⏹ Stop</button>` : ''}
+          </td>
         </tr>
-      `).join('') || '<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:30px">No bots found</td></tr>';
+      `).join('') || '<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:30px">No bots found</td></tr>';
+    }
+
+    async function adminStopBot(userId) {
+      if (!confirm('Force stop this bot?')) return;
+      const r = await fetch(`/api/admin/bots/${userId}/stop`, { method:'POST' });
+      const d = await r.json();
+      showToast(d.success ? 'Bot stopped ✅' : d.error, d.success ? 'success' : 'error');
+      if (d.success) loadBots();
+    }
+
+    async function adminRemoveBot(userId) {
+      if (!confirm('Remove this bot from panel config?')) return;
+      const r = await fetch(`/api/admin/bots/${userId}`, { method:'DELETE' });
+      const d = await r.json();
+      showToast(d.success ? 'Bot removed from panel config' : d.error, d.success ? 'success' : 'error');
+      if (d.success) loadBots();
     }
 
     async function loadPanel() {
       const r = await fetch('/api/admin/panel/status');
       const d = await r.json();
       renderServerStatus(d, 'panelDetailStats');
+    }
+
+    async function ensureManager() {
+      const r = await fetch('/api/admin/panel/ensure-manager', { method:'POST' });
+      const d = await r.json();
+      showToast(d.success ? d.message : d.error, d.success ? 'success' : 'error');
     }
 
     async function runBillingTick() {
@@ -408,7 +462,7 @@
     async function loadSettings() {
       const r = await fetch('/api/admin/settings');
       const d = await r.json();
-      ['coins_per_hour','daily_reward','signup_bonus','referral_reward','panel_server_id','panel_url'].forEach(k => {
+      ['coins_per_hour','deploy_cost','restart_cost','daily_reward','signup_bonus','referral_reward','panel_server_id','panel_url'].forEach(k => {
         const el = document.getElementById('s-' + k);
         if (el) el.value = d[k] || '';
       });
