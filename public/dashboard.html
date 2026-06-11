@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>🔥 Dashboard — NightFury Host</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--fire:#ff6b00;--fire2:#ff9500;--dark:#0a0a0f;--card:#111118;--border:#1e1e2e;--text:#e0e0f0;--muted:#888;--green:#00e676;--red:#ff4757;--blue:#448aff}
+    body{background:var(--dark);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh}
+    body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 80% 60% at 50% -10%,rgba(255,107,0,.1) 0%,transparent 70%);pointer-events:none;z-index:0}
+    nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:14px 32px;background:rgba(10,10,15,.9);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
+    .nav-logo{font-family:'Orbitron',sans-serif;font-weight:900;font-size:1.1rem;background:linear-gradient(90deg,var(--fire),var(--fire2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+    .nav-right{display:flex;align-items:center;gap:16px}
+    .coin-badge{display:flex;align-items:center;gap:6px;background:rgba(255,149,0,.12);border:1px solid rgba(255,149,0,.3);border-radius:20px;padding:6px 14px;font-size:.9rem;color:var(--fire2);font-weight:700}
+    .btn{display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border-radius:8px;font-weight:600;font-size:.88rem;border:none;cursor:pointer;transition:.2s;text-decoration:none;font-family:'Inter',sans-serif}
+    .btn-fire{background:linear-gradient(135deg,var(--fire),var(--fire2));color:#fff}
+    .btn-fire:hover{opacity:.85}
+    .btn-fire:disabled{opacity:.4;cursor:not-allowed}
+    .btn-outline{background:transparent;border:1px solid var(--border);color:var(--text)}
+    .btn-outline:hover{border-color:var(--fire);color:var(--fire2)}
+    .btn-red{background:rgba(255,71,87,.1);border:1px solid rgba(255,71,87,.3);color:var(--red)}
+    .btn-red:hover{background:rgba(255,71,87,.2)}
+    .btn-green{background:rgba(0,230,118,.1);border:1px solid rgba(0,230,118,.3);color:var(--green)}
+    .btn-green:hover{background:rgba(0,230,118,.2)}
+    .main{max-width:1100px;margin:0 auto;padding:32px 20px;position:relative;z-index:1}
+    h2{font-family:'Orbitron',sans-serif;font-size:1.4rem;font-weight:700;margin-bottom:20px}
+    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+    .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+    @media(max-width:700px){.grid-2{grid-template-columns:1fr}.grid-3{grid-template-columns:1fr}}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px}
+    .card-title{font-weight:700;font-size:.95rem;margin-bottom:16px;display:flex;align-items:center;gap:8px;color:var(--muted)}
+    .stat-big{font-family:'Orbitron',sans-serif;font-size:2rem;font-weight:900;background:linear-gradient(135deg,var(--fire),var(--fire2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+    .stat-sub{color:var(--muted);font-size:.82rem;margin-top:4px}
+    .bot-status{display:flex;align-items:center;gap:10px;padding:16px;border-radius:10px;margin-bottom:16px}
+    .bot-status.running{background:rgba(0,230,118,.06);border:1px solid rgba(0,230,118,.2)}
+    .bot-status.stopped{background:rgba(255,71,87,.06);border:1px solid rgba(255,71,87,.2)}
+    .bot-status.none{background:rgba(100,100,100,.06);border:1px solid var(--border)}
+    .status-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+    .dot-green{background:var(--green);animation:pulse 2s infinite}
+    .dot-red{background:var(--red)}
+    .dot-gray{background:var(--muted)}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+    .status-text{font-weight:700;font-size:1rem}
+    .status-text.running{color:var(--green)}.status-text.stopped{color:var(--red)}.status-text.none{color:var(--muted)}
+    .form-group{margin-bottom:14px}
+    label{display:block;font-size:.82rem;color:var(--muted);margin-bottom:6px}
+    input[type=text],input[type=password],textarea{width:100%;background:#0d0d14;border:1px solid var(--border);border-radius:8px;padding:10px 14px;color:var(--text);font-size:.9rem;font-family:'Inter',sans-serif;outline:none;transition:border-color .2s}
+    input:focus,textarea:focus{border-color:var(--fire)}
+    textarea{resize:vertical;min-height:80px}
+    .bot-actions{display:flex;gap:10px;flex-wrap:wrap}
+    .txn-list{display:flex;flex-direction:column;gap:8px;max-height:320px;overflow-y:auto}
+    .txn-item{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:#0d0d14;border-radius:8px;font-size:.85rem}
+    .txn-amount.pos{color:var(--green)}.txn-amount.neg{color:var(--red)}
+    .txn-desc{color:var(--muted);font-size:.8rem}
+    .daily-btn{width:100%;margin-top:8px}
+    .daily-countdown{text-align:center;color:var(--muted);font-size:.85rem;margin-top:8px}
+    .ref-box{background:#0d0d14;border:1px solid var(--border);border-radius:8px;padding:12px;font-family:monospace;font-size:.9rem;word-break:break-all;color:var(--fire2);cursor:pointer}
+    .ref-box:hover{border-color:var(--fire)}
+    .toast{position:fixed;bottom:24px;right:24px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 20px;font-size:.9rem;z-index:9999;transform:translateY(100px);opacity:0;transition:.3s}
+    .toast.show{transform:translateY(0);opacity:1}
+    .toast.success{border-color:rgba(0,230,118,.4);color:var(--green)}
+    .toast.error{border-color:rgba(255,71,87,.4);color:var(--red)}
+    .section-gap{margin-bottom:28px}
+    .help-text{color:var(--muted);font-size:.83rem;line-height:1.6;margin-top:8px}
+    .username-header{font-size:1.6rem;font-weight:700;margin-bottom:4px}
+    .welcome-sub{color:var(--muted);font-size:.9rem;margin-bottom:28px}
+  </style>
+</head>
+<body>
+  <nav>
+    <div class="nav-logo">⚡ NIGHTFURY HOST</div>
+    <div class="nav-right">
+      <div class="coin-badge">🪙 <span id="navCoins">...</span></div>
+      <span id="navUser" style="color:var(--muted);font-size:.9rem"></span>
+      <button class="btn btn-outline" onclick="logout()">Logout</button>
+    </div>
+  </nav>
+
+  <div class="main">
+    <div class="username-header" id="welcomeTitle">🔥 Dashboard</div>
+    <div class="welcome-sub" id="welcomeSub">Loading your hosting dashboard...</div>
+
+    <!-- Stats row -->
+    <div class="grid-3 section-gap">
+      <div class="card">
+        <div class="card-title">🪙 Coin Balance</div>
+        <div class="stat-big" id="coinBalance">—</div>
+        <div class="stat-sub">Available to spend</div>
+      </div>
+      <div class="card">
+        <div class="card-title">⏱️ Total Uptime</div>
+        <div class="stat-big" id="totalHours">—</div>
+        <div class="stat-sub">Hours hosted</div>
+      </div>
+      <div class="card">
+        <div class="card-title">📅 Member Since</div>
+        <div class="stat-big" id="memberSince">—</div>
+        <div class="stat-sub">Days active</div>
+      </div>
+    </div>
+
+    <div class="grid-2 section-gap">
+      <!-- BOT CONTROL -->
+      <div class="card">
+        <div class="card-title">🤖 Bot Control</div>
+        <div class="bot-status none" id="botStatusBox">
+          <div class="status-dot dot-gray"></div>
+          <div>
+            <div class="status-text none" id="botStatusText">No bot deployed</div>
+            <div class="txn-desc" id="botStatusSub">Deploy your bot below to get started</div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>SESSION_ID</label>
+          <input type="text" id="sessionInput" placeholder="NightFury!XXXXXX..." />
+          <div class="help-text">Get this by scanning the QR code when running the bot locally. Starts with "NightFury!" or your bot's prefix.</div>
+        </div>
+
+        <div class="bot-actions">
+          <button class="btn btn-fire" id="deployBtn" onclick="deployBot()">🚀 Deploy Bot (5 coins)</button>
+          <button class="btn btn-outline" id="restartBtn" onclick="restartBot()" style="display:none">♻️ Restart (2 coins)</button>
+          <button class="btn btn-red" id="stopBtn" onclick="stopBot()" style="display:none">⏹ Stop</button>
+        </div>
+      </div>
+
+      <!-- DAILY REWARD + REFERRAL -->
+      <div style="display:flex;flex-direction:column;gap:20px">
+        <div class="card">
+          <div class="card-title">🎁 Daily Reward</div>
+          <div style="font-size:1.8rem;font-weight:900;color:var(--fire2);margin-bottom:4px">+20 🪙</div>
+          <div class="stat-sub">Claim once every 24 hours</div>
+          <button class="btn btn-fire daily-btn" id="dailyBtn" onclick="claimDaily()">Claim Daily Coins</button>
+          <div class="daily-countdown" id="dailyCountdown"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">🔗 Referral Link</div>
+          <div class="stat-sub" style="margin-bottom:10px">Share & earn +25 coins per friend</div>
+          <div class="ref-box" id="refLink" onclick="copyRef()">Loading...</div>
+          <div class="stat-sub" style="margin-top:8px;font-size:.8rem">Click to copy</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- COIN HISTORY -->
+    <div class="card section-gap">
+      <div class="card-title">📊 Coin Transaction History</div>
+      <div class="txn-list" id="txnList">
+        <div style="color:var(--muted);text-align:center;padding:20px">Loading...</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    let userData = {};
+    let dailyInterval;
+
+    async function loadDashboard() {
+      try {
+        const r = await fetch('/api/dashboard/stats');
+        if (r.status === 401) { window.location.href = '/login'; return; }
+        const d = await r.json();
+        userData = d;
+
+        // Nav
+        document.getElementById('navCoins').textContent = d.user.coins;
+        document.getElementById('navUser').textContent = '@' + d.user.username;
+        document.getElementById('welcomeTitle').textContent = '👋 Welcome back, ' + d.user.username;
+        document.getElementById('welcomeSub').textContent = 'Your NightFury hosting dashboard';
+
+        // Stats
+        document.getElementById('coinBalance').textContent = d.user.coins;
+        document.getElementById('totalHours').textContent = d.bot && d.bot.total_hours ? parseFloat(d.bot.total_hours).toFixed(1) : '0';
+        const days = Math.floor((Date.now()/1000 - d.user.created_at) / 86400);
+        document.getElementById('memberSince').textContent = days;
+
+        // Referral
+        document.getElementById('refLink').textContent = location.origin + '/register?ref=' + d.user.referral_code;
+
+        // Bot status
+        updateBotUI(d.bot, d.panel);
+
+        // Daily
+        updateDailyUI(d.daily_available, d.next_daily_in);
+
+        // Transactions
+        loadTransactions();
+      } catch(err) { console.error(err); }
+    }
+
+    function updateBotUI(bot, panel) {
+      const box = document.getElementById('botStatusBox');
+      const txt = document.getElementById('botStatusText');
+      const sub = document.getElementById('botStatusSub');
+      const deployBtn = document.getElementById('deployBtn');
+      const stopBtn = document.getElementById('stopBtn');
+      const restartBtn = document.getElementById('restartBtn');
+
+      const panelState = panel ? panel.current_state : 'unknown';
+      const status = bot ? bot.status : 'none';
+
+      if (status === 'running' || panelState === 'running') {
+        box.className = 'bot-status running';
+        box.querySelector('.status-dot').className = 'status-dot dot-green';
+        txt.textContent = '🟢 Bot is RUNNING'; txt.className = 'status-text running';
+        sub.textContent = 'Your NightFury bot is live and responding';
+        deployBtn.style.display='none'; stopBtn.style.display=''; restartBtn.style.display='';
+        if (bot && bot.session_id) document.getElementById('sessionInput').value = bot.session_id;
+      } else if (status === 'stopped' || panelState === 'offline') {
+        box.className = 'bot-status stopped';
+        box.querySelector('.status-dot').className = 'status-dot dot-red';
+        txt.textContent = '🔴 Bot is STOPPED'; txt.className = 'status-text stopped';
+        sub.textContent = 'Deploy to restart your bot';
+        deployBtn.style.display=''; stopBtn.style.display='none'; restartBtn.style.display='none';
+        if (bot && bot.session_id) document.getElementById('sessionInput').value = bot.session_id;
+      } else {
+        box.className = 'bot-status none';
+        box.querySelector('.status-dot').className = 'status-dot dot-gray';
+        txt.textContent = '⚪ No bot deployed'; txt.className = 'status-text none';
+        sub.textContent = 'Enter your SESSION_ID below to deploy';
+        deployBtn.style.display=''; stopBtn.style.display='none'; restartBtn.style.display='none';
+      }
+    }
+
+    function updateDailyUI(available, remaining) {
+      const btn = document.getElementById('dailyBtn');
+      const countdown = document.getElementById('dailyCountdown');
+      if (available) {
+        btn.disabled = false; btn.textContent = '🎁 Claim Daily Coins (+20)';
+        countdown.textContent = '';
+      } else {
+        btn.disabled = true;
+        let secs = remaining;
+        clearInterval(dailyInterval);
+        dailyInterval = setInterval(() => {
+          secs--;
+          if (secs <= 0) { clearInterval(dailyInterval); loadDashboard(); return; }
+          const h = Math.floor(secs/3600), m = Math.floor((secs%3600)/60), s = secs%60;
+          countdown.textContent = `Next claim in: ${h}h ${m}m ${s}s`;
+          btn.textContent = `⏳ Available in ${h}h ${m}m`;
+        }, 1000);
+        const h = Math.floor(secs/3600), m = Math.floor((secs%3600)/60);
+        btn.textContent = `⏳ Available in ${h}h ${m}m`;
+      }
+    }
+
+    async function loadTransactions() {
+      const r = await fetch('/api/dashboard/coins/history');
+      const list = await r.json();
+      const el = document.getElementById('txnList');
+      if (!list.length) { el.innerHTML = '<div style="color:var(--muted);text-align:center;padding:20px">No transactions yet</div>'; return; }
+      el.innerHTML = list.map(t => `
+        <div class="txn-item">
+          <div>
+            <div style="font-weight:600">${t.description || t.type}</div>
+            <div class="txn-desc">${new Date(t.created_at*1000).toLocaleDateString()}</div>
+          </div>
+          <div class="txn-amount ${t.amount >= 0 ? 'pos' : 'neg'}">${t.amount >= 0 ? '+' : ''}${t.amount} 🪙</div>
+        </div>
+      `).join('');
+    }
+
+    async function deployBot() {
+      const sid = document.getElementById('sessionInput').value.trim();
+      if (!sid) { showToast('Enter your SESSION_ID first', 'error'); return; }
+      const btn = document.getElementById('deployBtn');
+      btn.disabled = true; btn.textContent = '⏳ Deploying...';
+      try {
+        const r = await fetch('/api/dashboard/bot/deploy', {
+          method:'POST', headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ session_id: sid })
+        });
+        const d = await r.json();
+        if (d.success) { showToast(d.message, 'success'); setTimeout(loadDashboard, 1500); }
+        else { showToast(d.error, 'error'); btn.disabled=false; btn.textContent='🚀 Deploy Bot (5 coins)'; }
+      } catch { showToast('Network error', 'error'); btn.disabled=false; btn.textContent='🚀 Deploy Bot (5 coins)'; }
+    }
+
+    async function stopBot() {
+      if (!confirm('Stop your bot?')) return;
+      const r = await fetch('/api/dashboard/bot/stop', { method:'POST' });
+      const d = await r.json();
+      showToast(d.success ? d.message : d.error, d.success ? 'success' : 'error');
+      if (d.success) setTimeout(loadDashboard, 1000);
+    }
+
+    async function restartBot() {
+      const r = await fetch('/api/dashboard/bot/restart', { method:'POST' });
+      const d = await r.json();
+      showToast(d.success ? d.message : d.error, d.success ? 'success' : 'error');
+      if (d.success) setTimeout(loadDashboard, 2000);
+    }
+
+    async function claimDaily() {
+      const r = await fetch('/api/dashboard/daily', { method:'POST' });
+      const d = await r.json();
+      showToast(d.success ? d.message : d.error, d.success ? 'success' : 'error');
+      if (d.success) loadDashboard();
+    }
+
+    function copyRef() {
+      const link = document.getElementById('refLink').textContent;
+      navigator.clipboard.writeText(link).then(() => showToast('Referral link copied! 🔗', 'success'));
+    }
+
+    async function logout() {
+      await fetch('/api/auth/logout', { method:'POST' });
+      window.location.href = '/login';
+    }
+
+    function showToast(msg, type='success') {
+      const t = document.getElementById('toast');
+      t.textContent = msg; t.className = 'toast ' + type;
+      setTimeout(() => t.classList.add('show'), 10);
+      setTimeout(() => t.classList.remove('show'), 3500);
+    }
+
+    loadDashboard();
+    setInterval(loadDashboard, 30000); // refresh every 30s
+  </script>
+</body>
+</html>

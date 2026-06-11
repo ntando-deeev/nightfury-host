@@ -1,440 +1,178 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>🔥 NightFury Bot — Hosting</title>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>🔥 NightFury Bot Hosting</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --fire: #ff6b00;
-      --fire2: #ff9500;
-      --dark: #0a0a0f;
-      --card: #111118;
-      --border: #1e1e2e;
-      --text: #e0e0f0;
-      --muted: #888;
-      --green: #00e676;
-    }
-
-    body {
-      background: var(--dark);
-      color: var(--text);
-      font-family: 'Inter', sans-serif;
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
-
-    /* ---- BACKGROUND PARTICLES ---- */
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background:
-        radial-gradient(ellipse 80% 60% at 50% -10%, rgba(255,107,0,0.18) 0%, transparent 70%),
-        radial-gradient(ellipse 40% 40% at 90% 80%, rgba(255,149,0,0.08) 0%, transparent 60%);
-      pointer-events: none;
-      z-index: 0;
-    }
-
-    /* ---- NAV ---- */
-    nav {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 16px 40px;
-      background: rgba(10,10,15,0.85);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border);
-    }
-    .nav-logo {
-      font-family: 'Orbitron', sans-serif;
-      font-weight: 900;
-      font-size: 1.3rem;
-      background: linear-gradient(90deg, var(--fire), var(--fire2));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      letter-spacing: 2px;
-    }
-    .nav-links { display: flex; gap: 24px; }
-    .nav-links a {
-      color: var(--muted);
-      text-decoration: none;
-      font-size: 0.9rem;
-      transition: color .2s;
-    }
-    .nav-links a:hover { color: var(--fire2); }
-    .nav-badge {
-      display: flex; align-items: center; gap: 6px;
-      background: rgba(0,230,118,0.1);
-      border: 1px solid rgba(0,230,118,0.3);
-      border-radius: 20px;
-      padding: 4px 14px;
-      font-size: 0.8rem;
-      color: var(--green);
-    }
-    .nav-badge::before {
-      content: '';
-      width: 7px; height: 7px;
-      border-radius: 50%;
-      background: var(--green);
-      animation: pulse 2s infinite;
-    }
-
-    /* ---- HERO ---- */
-    .hero {
-      position: relative;
-      z-index: 1;
-      text-align: center;
-      padding: 100px 20px 70px;
-    }
-    .hero-icon { font-size: 5rem; display: block; margin-bottom: 20px; animation: flicker 3s infinite; }
-    @keyframes flicker {
-      0%,100% { filter: drop-shadow(0 0 18px #ff6b00); }
-      50%      { filter: drop-shadow(0 0 36px #ff9500); }
-    }
-    .hero h1 {
-      font-family: 'Orbitron', sans-serif;
-      font-size: clamp(2.2rem, 6vw, 4.5rem);
-      font-weight: 900;
-      background: linear-gradient(120deg, #fff 20%, var(--fire2) 60%, var(--fire));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      line-height: 1.1;
-      margin-bottom: 18px;
-    }
-    .hero p {
-      color: var(--muted);
-      font-size: 1.15rem;
-      max-width: 560px;
-      margin: 0 auto 36px;
-      line-height: 1.7;
-    }
-    .hero-buttons { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
-    .btn {
-      display: inline-flex; align-items: center; gap: 8px;
-      padding: 14px 32px;
-      border-radius: 8px;
-      font-size: 1rem;
-      font-weight: 600;
-      text-decoration: none;
-      transition: transform .2s, box-shadow .2s;
-      cursor: pointer;
-      border: none;
-    }
-    .btn:hover { transform: translateY(-2px); }
-    .btn-primary {
-      background: linear-gradient(135deg, var(--fire), var(--fire2));
-      color: #fff;
-      box-shadow: 0 4px 20px rgba(255,107,0,0.4);
-    }
-    .btn-primary:hover { box-shadow: 0 6px 28px rgba(255,107,0,0.6); }
-    .btn-outline {
-      background: transparent;
-      color: var(--text);
-      border: 1px solid var(--border);
-    }
-    .btn-outline:hover { border-color: var(--fire); color: var(--fire2); }
-
-    /* ---- STATS ---- */
-    .stats {
-      position: relative; z-index: 1;
-      display: flex; justify-content: center; flex-wrap: wrap; gap: 20px;
-      padding: 0 20px 70px;
-    }
-    .stat-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 28px 40px;
-      text-align: center;
-      min-width: 160px;
-      transition: border-color .2s, transform .2s;
-    }
-    .stat-card:hover { border-color: var(--fire); transform: translateY(-4px); }
-    .stat-num {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 2.2rem;
-      font-weight: 900;
-      background: linear-gradient(135deg, var(--fire), var(--fire2));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    .stat-label { color: var(--muted); font-size: 0.85rem; margin-top: 6px; }
-
-    /* ---- FEATURES ---- */
-    .section {
-      position: relative; z-index: 1;
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 60px 20px;
-    }
-    .section-title {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 1.8rem;
-      font-weight: 700;
-      text-align: center;
-      margin-bottom: 12px;
-      color: var(--text);
-    }
-    .section-sub { text-align: center; color: var(--muted); margin-bottom: 48px; }
-    .features-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 20px;
-    }
-    .feature-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 28px 24px;
-      transition: border-color .2s, transform .2s;
-    }
-    .feature-card:hover { border-color: var(--fire); transform: translateY(-4px); }
-    .feature-icon { font-size: 2rem; margin-bottom: 14px; }
-    .feature-title { font-weight: 600; font-size: 1rem; margin-bottom: 8px; }
-    .feature-desc { color: var(--muted); font-size: 0.88rem; line-height: 1.6; }
-
-    /* ---- COMMANDS ---- */
-    .commands-list {
-      display: flex; flex-wrap: wrap; gap: 10px;
-      justify-content: center;
-      margin-top: 24px;
-    }
-    .cmd-tag {
-      background: rgba(255,107,0,0.08);
-      border: 1px solid rgba(255,107,0,0.25);
-      color: var(--fire2);
-      border-radius: 6px;
-      padding: 6px 14px;
-      font-size: 0.82rem;
-      font-family: monospace;
-    }
-
-    /* ---- DEPLOY ---- */
-    .deploy-section {
-      position: relative; z-index: 1;
-      background: var(--card);
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-      padding: 70px 20px;
-      text-align: center;
-    }
-    .deploy-section h2 {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 2rem;
-      font-weight: 700;
-      margin-bottom: 14px;
-    }
-    .deploy-section p { color: var(--muted); max-width: 500px; margin: 0 auto 32px; line-height: 1.7; }
-    .steps {
-      display: flex; justify-content: center; gap: 32px;
-      flex-wrap: wrap; margin-bottom: 40px;
-    }
-    .step {
-      display: flex; flex-direction: column; align-items: center;
-      max-width: 180px; text-align: center;
-    }
-    .step-num {
-      width: 44px; height: 44px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--fire), var(--fire2));
-      display: flex; align-items: center; justify-content: center;
-      font-family: 'Orbitron', sans-serif;
-      font-weight: 700; font-size: 1.1rem;
-      margin-bottom: 12px;
-      box-shadow: 0 0 18px rgba(255,107,0,0.4);
-    }
-    .step-text { color: var(--muted); font-size: 0.85rem; line-height: 1.5; }
-
-    /* ---- FOOTER ---- */
-    footer {
-      position: relative; z-index: 1;
-      text-align: center;
-      padding: 36px 20px;
-      color: var(--muted);
-      font-size: 0.85rem;
-      border-top: 1px solid var(--border);
-    }
-    footer span { color: var(--fire2); }
-
-    /* ---- PULSE ---- */
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.4; }
-    }
-
-    @media (max-width: 600px) {
-      nav { padding: 14px 20px; }
-      .nav-links { display: none; }
-    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--fire:#ff6b00;--fire2:#ff9500;--dark:#0a0a0f;--card:#111118;--border:#1e1e2e;--text:#e0e0f0;--muted:#888;--green:#00e676}
+    body{background:var(--dark);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh;overflow-x:hidden}
+    body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 80% 60% at 50% -10%,rgba(255,107,0,.18) 0%,transparent 70%),radial-gradient(ellipse 40% 40% at 90% 80%,rgba(255,149,0,.08) 0%,transparent 60%);pointer-events:none;z-index:0}
+    nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:16px 40px;background:rgba(10,10,15,.85);backdrop-filter:blur(12px);border-bottom:1px solid var(--border)}
+    .nav-logo{font-family:'Orbitron',sans-serif;font-weight:900;font-size:1.3rem;background:linear-gradient(90deg,var(--fire),var(--fire2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:2px}
+    .nav-links{display:flex;gap:24px;align-items:center}
+    .nav-links a{color:var(--muted);text-decoration:none;font-size:.9rem;transition:color .2s}
+    .nav-links a:hover{color:var(--fire2)}
+    .btn{display:inline-flex;align-items:center;gap:8px;padding:10px 22px;border-radius:8px;font-weight:600;font-size:.9rem;text-decoration:none;transition:.2s;cursor:pointer;border:none}
+    .btn-fire{background:linear-gradient(135deg,var(--fire),var(--fire2));color:#fff}
+    .btn-fire:hover{opacity:.85;transform:translateY(-1px)}
+    .btn-outline{background:transparent;border:1px solid var(--border);color:var(--text)}
+    .btn-outline:hover{border-color:var(--fire);color:var(--fire2)}
+    .badge-online{display:flex;align-items:center;gap:6px;background:rgba(0,230,118,.1);border:1px solid rgba(0,230,118,.3);border-radius:20px;padding:4px 14px;font-size:.8rem;color:var(--green)}
+    .badge-online::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+    .hero{position:relative;z-index:1;text-align:center;padding:100px 20px 70px}
+    .hero-icon{font-size:5rem;display:block;margin-bottom:20px;animation:flicker 3s infinite}
+    @keyframes flicker{0%,100%{filter:drop-shadow(0 0 18px #ff6b00)}50%{filter:drop-shadow(0 0 36px #ff9500)}}
+    h1{font-family:'Orbitron',sans-serif;font-size:clamp(2rem,6vw,4rem);font-weight:900;line-height:1.1;margin-bottom:16px}
+    .hero p{color:var(--muted);font-size:1.15rem;max-width:560px;margin:0 auto 40px;line-height:1.7}
+    .hero-btns{display:flex;justify-content:center;gap:16px;flex-wrap:wrap}
+    .stats{position:relative;z-index:1;display:flex;justify-content:center;flex-wrap:wrap;gap:20px;padding:0 20px 70px}
+    .stat-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:28px 40px;text-align:center;min-width:160px;transition:.2s}
+    .stat-card:hover{border-color:var(--fire);transform:translateY(-4px)}
+    .stat-num{font-family:'Orbitron',sans-serif;font-size:2.2rem;font-weight:900;background:linear-gradient(135deg,var(--fire),var(--fire2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+    .stat-label{color:var(--muted);font-size:.85rem;margin-top:6px}
+    .section{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:60px 20px}
+    .section-title{font-family:'Orbitron',sans-serif;font-size:1.8rem;font-weight:700;text-align:center;margin-bottom:12px}
+    .section-sub{text-align:center;color:var(--muted);margin-bottom:48px}
+    .features-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px}
+    .feature-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:28px 24px;transition:.2s}
+    .feature-card:hover{border-color:var(--fire);transform:translateY(-4px)}
+    .feature-icon{font-size:2rem;margin-bottom:14px}
+    .feature-title{font-weight:600;font-size:1rem;margin-bottom:8px}
+    .feature-desc{color:var(--muted);font-size:.88rem;line-height:1.6}
+    .plans-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:24px}
+    .plan-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:32px 24px;text-align:center;transition:.2s;position:relative}
+    .plan-card:hover{border-color:var(--fire);transform:translateY(-4px)}
+    .plan-card.featured{border-color:var(--fire);background:linear-gradient(135deg,rgba(255,107,0,.08),var(--card))}
+    .plan-badge{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,var(--fire),var(--fire2));color:#fff;padding:4px 16px;border-radius:20px;font-size:.75rem;font-weight:700}
+    .plan-name{font-family:'Orbitron',sans-serif;font-size:1.1rem;font-weight:700;margin-bottom:8px}
+    .plan-coins{font-size:2.4rem;font-weight:900;color:var(--fire2);margin:16px 0 4px}
+    .plan-coins span{font-size:1rem;color:var(--muted)}
+    .plan-features{list-style:none;text-align:left;margin:20px 0;display:flex;flex-direction:column;gap:8px}
+    .plan-features li{color:var(--muted);font-size:.88rem;display:flex;align-items:center;gap:8px}
+    .plan-features li::before{content:'✓';color:var(--green);font-weight:700}
+    .deploy-section{position:relative;z-index:1;background:var(--card);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:70px 20px;text-align:center}
+    .steps{display:flex;justify-content:center;gap:32px;flex-wrap:wrap;margin-bottom:40px}
+    .step{display:flex;flex-direction:column;align-items:center;gap:12px;max-width:180px}
+    .step-num{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--fire),var(--fire2));display:flex;align-items:center;justify-content:center;font-family:'Orbitron',sans-serif;font-weight:900;font-size:1.2rem;color:#fff}
+    .step-text{color:var(--muted);font-size:.9rem;text-align:center;line-height:1.5}
+    footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:40px 20px;text-align:center;color:var(--muted);font-size:.85rem}
+    footer a{color:var(--fire2);text-decoration:none}
   </style>
 </head>
 <body>
-
-  <!-- NAV -->
   <nav>
-    <div class="nav-logo">🔥 NIGHTFURY</div>
+    <div class="nav-logo">⚡ NIGHTFURY</div>
     <div class="nav-links">
       <a href="#features">Features</a>
-      <a href="#commands">Commands</a>
-      <a href="#deploy">Deploy</a>
-      <a href="https://github.com/ntando-deeev/NightFuryBot" target="_blank">GitHub</a>
+      <a href="#plans">Plans</a>
+      <a href="#how">How it works</a>
+      <div class="badge-online">Online</div>
     </div>
-    <div class="nav-badge">BOT ONLINE</div>
+    <div class="nav-links">
+      <a href="/login" class="btn btn-outline">Login</a>
+      <a href="/register" class="btn btn-fire">Get Started</a>
+    </div>
   </nav>
 
-  <!-- HERO -->
   <section class="hero">
     <span class="hero-icon">🔥</span>
-    <h1>NightFury Bot</h1>
-    <p>The most powerful WhatsApp MD bot — built for speed, protected by bytecode, loaded with 100+ commands. Created by <strong>Mr Ntando Ofc</strong>.</p>
-    <div class="hero-buttons">
-      <a class="btn btn-primary" href="https://github.com/ntando-deeev/NightFuryBot" target="_blank">
-        ⭐ View on GitHub
-      </a>
-      <a class="btn btn-outline" href="#deploy">
-        🚀 Deploy Now
-      </a>
+    <h1>Host Your<br/><span style="background:linear-gradient(90deg,var(--fire),var(--fire2));-webkit-background-clip:text;-webkit-text-fill-color:transparent">NightFury Bot</span></h1>
+    <p>Deploy your WhatsApp bot in seconds. Real coin system, instant deployment, 24/7 uptime — powered by Spaceify servers.</p>
+    <div class="hero-btns">
+      <a href="/register" class="btn btn-fire" style="font-size:1.05rem;padding:14px 32px">🚀 Deploy Now — Free</a>
+      <a href="#how" class="btn btn-outline" style="font-size:1.05rem;padding:14px 32px">How it works</a>
     </div>
   </section>
 
-  <!-- STATS -->
   <div class="stats">
-    <div class="stat-card">
-      <div class="stat-num">100+</div>
-      <div class="stat-label">Commands</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-num">24/7</div>
-      <div class="stat-label">Uptime</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-num">⚡</div>
-      <div class="stat-label">Ultra Fast</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-num">🔒</div>
-      <div class="stat-label">Bytecode Protected</div>
-    </div>
+    <div class="stat-card"><div class="stat-num" id="stat-users">...</div><div class="stat-label">Registered Users</div></div>
+    <div class="stat-card"><div class="stat-num" id="stat-bots">...</div><div class="stat-label">Bots Deployed</div></div>
+    <div class="stat-card"><div class="stat-num">99.9%</div><div class="stat-label">Uptime</div></div>
+    <div class="stat-card"><div class="stat-num">50</div><div class="stat-label">Free Coins on Signup</div></div>
   </div>
 
-  <!-- FEATURES -->
   <section class="section" id="features">
-    <h2 class="section-title">What Makes NightFury Different</h2>
-    <p class="section-sub">Built from the ground up to be the most capable WhatsApp MD bot available.</p>
+    <div class="section-title">Everything You Need</div>
+    <div class="section-sub">Deploy, manage, and monitor your NightFury WhatsApp bot</div>
     <div class="features-grid">
-      <div class="feature-card">
-        <div class="feature-icon">🤖</div>
-        <div class="feature-title">Smart Auto-Reply</div>
-        <div class="feature-desc">Responds to greetings, keywords, and fully customisable triggers. Configure everything in <code>config.js</code>.</div>
+      <div class="feature-card"><div class="feature-icon">⚡</div><div class="feature-title">Instant Deployment</div><div class="feature-desc">Paste your SESSION_ID and your bot goes live in under 30 seconds on our Spaceify servers.</div></div>
+      <div class="feature-card"><div class="feature-icon">🪙</div><div class="feature-title">Real Coin System</div><div class="feature-desc">Earn coins daily, via referrals, or buy them. Spend coins to keep your bot running.</div></div>
+      <div class="feature-card"><div class="feature-icon">🛠️</div><div class="feature-title">Full Bot Control</div><div class="feature-desc">Start, stop, restart your bot from your dashboard. Real-time server status.</div></div>
+      <div class="feature-card"><div class="feature-icon">📊</div><div class="feature-title">Live Stats</div><div class="feature-desc">See your bot's uptime, coin balance, and transaction history at a glance.</div></div>
+      <div class="feature-card"><div class="feature-icon">🎁</div><div class="feature-title">Daily Rewards</div><div class="feature-desc">Claim free coins every 24 hours. Refer friends for bonus coins.</div></div>
+      <div class="feature-card"><div class="feature-icon">👑</div><div class="feature-title">Admin Panel</div><div class="feature-desc">Full admin control — manage users, coins, bots, and server power from one dashboard.</div></div>
+    </div>
+  </section>
+
+  <section class="section" id="plans">
+    <div class="section-title">Coin Plans</div>
+    <div class="section-sub">Start free. Scale with coins. No subscriptions.</div>
+    <div class="plans-grid">
+      <div class="plan-card">
+        <div class="plan-name">🌱 Starter</div>
+        <div class="plan-coins">50 <span>coins FREE</span></div>
+        <ul class="plan-features">
+          <li>50 coins on signup</li>
+          <li>+20 coins/day (daily reward)</li>
+          <li>Bot deployment: 5 coins</li>
+          <li>Hosting: 2 coins/hour</li>
+        </ul>
+        <a href="/register" class="btn btn-outline" style="width:100%;justify-content:center">Sign Up Free</a>
       </div>
-      <div class="feature-card">
-        <div class="feature-icon">🔒</div>
-        <div class="feature-title">Bytecode Protected</div>
-        <div class="feature-desc">All command files compiled to <code>.jsc</code> bytecode — unreadable binaries that protect your logic.</div>
+      <div class="plan-card featured">
+        <div class="plan-badge">POPULAR</div>
+        <div class="plan-name">🔥 Pro</div>
+        <div class="plan-coins">500 <span>coins</span></div>
+        <ul class="plan-features">
+          <li>500 coins loaded instantly</li>
+          <li>~250 hours of hosting</li>
+          <li>Priority support</li>
+          <li>Referral bonuses included</li>
+        </ul>
+        <a href="/register" class="btn btn-fire" style="width:100%;justify-content:center">Get Pro</a>
       </div>
-      <div class="feature-card">
-        <div class="feature-icon">⚡</div>
-        <div class="feature-title">Ultra Fast</div>
-        <div class="feature-desc">Optimised session handling and RAM management for near-instant response times on any host.</div>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon">👑</div>
-        <div class="feature-title">Owner Tools</div>
-        <div class="feature-desc">Broadcast, anti-call, mode switching, auto-react — full control over your bot from WhatsApp.</div>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon">🛡️</div>
-        <div class="feature-title">Group Protection</div>
-        <div class="feature-desc">Antilink, antispam, antitag, anti-group-mention — keeps your groups clean automatically.</div>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon">🌐</div>
-        <div class="feature-title">100+ Commands</div>
-        <div class="feature-desc">AI, media, admin, fun, sticker, and more. New commands added regularly by Mr Ntando Ofc.</div>
+      <div class="plan-card">
+        <div class="plan-name">💎 Elite</div>
+        <div class="plan-coins">2000 <span>coins</span></div>
+        <ul class="plan-features">
+          <li>2000 coins loaded instantly</li>
+          <li>~1000 hours of hosting</li>
+          <li>VIP support</li>
+          <li>Exclusive badge</li>
+        </ul>
+        <a href="/register" class="btn btn-outline" style="width:100%;justify-content:center">Get Elite</a>
       </div>
     </div>
   </section>
 
-  <!-- COMMANDS -->
-  <section class="section" id="commands">
-    <h2 class="section-title">Command Categories</h2>
-    <p class="section-sub">Over 100 commands across every category you need.</p>
-    <div class="commands-list">
-      <span class="cmd-tag">.menu</span>
-      <span class="cmd-tag">.alive</span>
-      <span class="cmd-tag">.sticker</span>
-      <span class="cmd-tag">.toimg</span>
-      <span class="cmd-tag">.ai</span>
-      <span class="cmd-tag">.play</span>
-      <span class="cmd-tag">.ytdl</span>
-      <span class="cmd-tag">.tiktok</span>
-      <span class="cmd-tag">.kick</span>
-      <span class="cmd-tag">.add</span>
-      <span class="cmd-tag">.promote</span>
-      <span class="cmd-tag">.demote</span>
-      <span class="cmd-tag">.ban</span>
-      <span class="cmd-tag">.antilink</span>
-      <span class="cmd-tag">.antispam</span>
-      <span class="cmd-tag">.broadcast</span>
-      <span class="cmd-tag">.ping</span>
-      <span class="cmd-tag">.translate</span>
-      <span class="cmd-tag">.weather</span>
-      <span class="cmd-tag">.lyrics</span>
-      <span class="cmd-tag">.gcreate</span>
-      <span class="cmd-tag">.tagall</span>
-      <span class="cmd-tag">.mute</span>
-      <span class="cmd-tag">.unmute</span>
-      <span class="cmd-tag">.delete</span>
-      <span class="cmd-tag">+ many more</span>
-    </div>
-  </section>
-
-  <!-- DEPLOY -->
-  <div class="deploy-section" id="deploy">
-    <h2>🚀 Deploy to Render</h2>
-    <p>Get NightFury Bot running in minutes. Fork the repo, connect your session ID, and deploy — no local setup needed.</p>
-
+  <section class="deploy-section" id="how">
+    <h2 style="font-family:'Orbitron',sans-serif;font-size:2rem;font-weight:700;margin-bottom:14px">Deploy in 3 Steps</h2>
+    <p style="color:var(--muted);max-width:500px;margin:0 auto 40px;line-height:1.7">Get your NightFury bot online in under a minute</p>
     <div class="steps">
-      <div class="step">
-        <div class="step-num">1</div>
-        <div class="step-text">Fork the NightFury Bot repo on GitHub</div>
-      </div>
-      <div class="step">
-        <div class="step-num">2</div>
-        <div class="step-text">Get your Session ID from the Pair Site</div>
-      </div>
-      <div class="step">
-        <div class="step-num">3</div>
-        <div class="step-text">Create a new Web Service on Render</div>
-      </div>
-      <div class="step">
-        <div class="step-num">4</div>
-        <div class="step-text">Set <code>SESSION_ID</code> env var and deploy</div>
-      </div>
+      <div class="step"><div class="step-num">1</div><div class="step-text"><strong style="color:var(--text)">Sign Up</strong><br/>Create your free account and get 50 coins instantly</div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-text"><strong style="color:var(--text)">Get Session ID</strong><br/>Scan QR on the bot, copy your SESSION_ID string</div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-text"><strong style="color:var(--text)">Deploy!</strong><br/>Paste SESSION_ID in your dashboard and hit Deploy</div></div>
     </div>
+    <a href="/register" class="btn btn-fire" style="font-size:1.1rem;padding:16px 40px">🔥 Start Now — It's Free</a>
+  </section>
 
-    <div class="hero-buttons">
-      <a class="btn btn-primary" href="https://render.com/deploy" target="_blank">
-        🚀 Deploy on Render
-      </a>
-      <a class="btn btn-outline" href="https://github.com/ntando-deeev/NightFuryBot/fork" target="_blank">
-        🍴 Fork Repo
-      </a>
-    </div>
-  </div>
-
-  <!-- FOOTER -->
   <footer>
-    <p>🔥 <span>NightFury Bot</span> — Created with ❤️ by <span>Mr Ntando Ofc</span></p>
-    <p style="margin-top:8px;">For educational purposes only. Use responsibly.</p>
+    <p>🔥 <strong>NightFury Bot Hosting</strong> — Created by <a href="#">Mr Ntando Ofc</a></p>
+    <p style="margin-top:8px">Powered by Spaceify · Built with ❤️</p>
   </footer>
 
+  <script>
+    fetch('/api/admin/stats').then(r=>r.json()).then(d=>{
+      if(d.totalUsers !== undefined) document.getElementById('stat-users').textContent = d.totalUsers;
+      if(d.totalBots !== undefined) document.getElementById('stat-bots').textContent = d.totalBots;
+    }).catch(()=>{
+      document.getElementById('stat-users').textContent = '—';
+      document.getElementById('stat-bots').textContent = '—';
+    });
+  </script>
 </body>
 </html>

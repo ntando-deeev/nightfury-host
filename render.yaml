@@ -8,3 +8,13 @@ services:
     envVars:
       - key: NODE_ENV
         value: production
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: PANEL_URL
+        value: https://panel.spaceify.eu
+      - key: PANEL_KEY
+        sync: false
+      - key: PANEL_SERVER_ID
+        value: 36a73d5f
+      - key: DB_PATH
+        value: /opt/render/project/src/data/nightfury.db
