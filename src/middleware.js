@@ -15,7 +15,7 @@ function requireAdmin(req, res, next) {
   if (req.xhr || req.headers.accept?.includes('json')) {
     return res.status(403).json({ error: 'Admin access required' });
   }
-  return res.redirect('/dashboard');
+  return res.redirect('/admin-login');
 }
 
 module.exports = { requireAuth, requireAdmin };

@@ -86,6 +86,34 @@ router.post('/login', async (req, res) => {
   }
 });
 
+// ── ADMIN LOGIN ───────────────────────────────────────────────────────────────
+// Separate endpoint for /admin-login page — only succeeds for is_admin = 1 users
+router.post('/admin-login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    if (!email || !password) return res.status(400).json({ error: 'All fields required' });
+
+    const user = db.prepare('SELECT * FROM users WHERE email = ? OR username = ?').get(email, email);
+    if (!user) return res.status(401).json({ error: 'Invalid credentials' });
+    if (user.is_banned) return res.status(403).json({ error: 'Account banned. Contact support.' });
+
+    const match = await bcrypt.compare(password, user.password);
+    if (!match) return res.status(401).json({ error: 'Invalid credentials' });
+
+    // Extra guard — only admins allowed through this endpoint
+    if (!user.is_admin) return res.status(403).json({ error: 'Access denied. Admin accounts only.' });
+
+    req.session.userId   = user.id;
+    req.session.username = user.username;
+    req.session.isAdmin  = user.is_admin;
+
+    res.json({ success: true, redirect: '/admin' });
+  } catch (err) {
+    console.error('Admin login error:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
 // ── LOGOUT ────────────────────────────────────────────────────────────────────
 router.post('/logout', (req, res) => {
   req.session.destroy(() => res.json({ success: true, redirect: '/login' }));
