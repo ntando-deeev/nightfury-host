@@ -67,17 +67,6 @@ Object.entries(pages).forEach(([route, file]) => {
   });
 });
 
-app.use((req, res) => {
-  if (fs.existsSync(path.join(__dirname, 'public', '404.html'))) {
-    return res.status(404).sendFile(path.join(__dirname, 'public', '404.html'));
-  }
-  res.status(404).json({ error: 'Not found' });
-});
-
-app.listen(PORT, () => {
-  console.log('NightFury Host v2.0 running on port ' + PORT);
-});
-
 // TEMP ADMIN SETUP — auto-removed after first successful use
 const bcrypt_seed = require('bcryptjs');
 const { v4: uuidv4_seed } = require('uuid');
@@ -97,4 +86,15 @@ app.get('/setup-nf-admin-x7k2', async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
+});
+
+app.use((req, res) => {
+  if (fs.existsSync(path.join(__dirname, 'public', '404.html'))) {
+    return res.status(404).sendFile(path.join(__dirname, 'public', '404.html'));
+  }
+  res.status(404).json({ error: 'Not found' });
+});
+
+app.listen(PORT, () => {
+  console.log('NightFury Host v2.0 running on port ' + PORT);
 });
